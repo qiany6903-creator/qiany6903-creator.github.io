@@ -1,6 +1,6 @@
 ---
 title: 关于我
-date: '2026-03-31'
+date: '2026-03-31 23:09:12'
 tags: []
 mood: ''
 cover: ''
@@ -12,5 +12,3 @@ description: ''
 你好，我是千幻。
 
 这里是「千梦之梦」，记录一些想留下来的东西。
-
-这个页面可以在 `XHBlogs/app/about/about.md` 里随意改写。

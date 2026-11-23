@@ -5,8 +5,7 @@ import matter from 'gray-matter';
 // 引入前台客户端组件
 import CreativeWorkshopClient from './CreativeWorkshopClient';
 
-function getLocalItems(directoryName: string, typeName: string) {
-  const dirPath = path.join(process.cwd(), directoryName);
+function getLocalItems(dirPath: string, directoryName: string, typeName: string) {
   let items: any[] = [];
   try {
     if (fs.existsSync(dirPath)) {
@@ -39,9 +38,9 @@ function getLocalItems(directoryName: string, typeName: string) {
 }
 
 export default function CreativeWorkshopPage() {
-  const posts = getLocalItems('posts', 'post');
-  const chatters = getLocalItems('chatters', 'chatter');
-  const moments = getLocalItems('moments', 'moment');
+  const posts = getLocalItems(path.join(process.cwd(), 'posts'), 'posts', 'post');
+  const chatters = getLocalItems(path.join(process.cwd(), 'chatters'), 'chatters', 'chatter');
+  const moments = getLocalItems(path.join(process.cwd(), 'moments'), 'moments', 'moment');
 
   return (
     <CreativeWorkshopClient

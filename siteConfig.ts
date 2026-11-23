@@ -39,8 +39,8 @@ export const siteConfig = {
     gitee: "",
     google: "",
     email: "",
-    qq: "1124533793",
-    wechat: "XingHuisama",
+    qq: "",
+    wechat: "",
   },
   counts: {
     photos: 128, // 照片墙数量可以手动写死或动态计算

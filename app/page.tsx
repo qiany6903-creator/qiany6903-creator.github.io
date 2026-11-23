@@ -87,7 +87,7 @@ export default function Home() {
 
   const chatterCount = allChatters.length;
   const realPhotoCount = albums.reduce((total, album) => total + album.photos.length, 0);
-  const latestAlbum = albums.length > 0 ? albums[0] : { id: '', title: '照片墙', description: '查看摄影', cover: siteConfig.photoWallImage, date: '' };
+  const latestAlbum = albums.length > 0 ? albums[0] : { id: '', title: '画册', description: '查看摄影', cover: siteConfig.photoWallImage, date: '' };
 
   return (
     <ToastProvider>
@@ -114,7 +114,7 @@ export default function Home() {
               {/* 歌词栏 */}
               <div className="w-full mt-[-10px]"><LyricBar/></div>
 
-              {/* 第二行：文章轮播 + 照片墙 + 说说 + 主题切换 */}
+              {/* 第二行：文章轮播 + 画册 + 说说 + 主题切换 */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full">
 
                 {/* 左侧：文章轮播 (电脑端占4列，手机端排最上面) */}
@@ -125,7 +125,7 @@ export default function Home() {
                 {/* 右侧：组合面板 (电脑端占8列) */}
                 <div className="col-span-1 lg:col-span-8 flex flex-col gap-6">
 
-                  {/* 照片墙大海报 */}
+                  {/* 画册大海报 */}
                   <Link href="/photowall" className="w-full rounded-3xl bg-white/40 dark:bg-slate-800/50 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-xl overflow-hidden transition-all duration-700 hover:scale-[1.02] relative group min-h-[200px] sm:min-h-[220px] flex-shrink-0">
                     <img src={latestAlbum.cover} className="w-full h-full absolute inset-0 object-cover transition-transform duration-700 group-hover:scale-105 opacity-90"/>
                     <div className="absolute inset-0 bg-black/30 dark:bg-black/50 group-hover:bg-black/10 transition-colors duration-500"></div>

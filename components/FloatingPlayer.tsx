@@ -47,10 +47,10 @@ export default function FloatingPlayer() {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white/80 backdrop-blur-sm rounded-full shadow-inner"></div>
         </div>
 
-        {/* 歌曲信息与滚动歌词 */}
+        {/* 歌曲信息 */}
         <div className="flex flex-col w-32 max-w-[120px] overflow-hidden pointer-events-none">
           <span className="text-sm font-bold text-slate-900 dark:text-white truncate transition-colors duration-700">{currentSong.title}</span>
-          <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate transition-colors duration-700">{currentLyric}</span>
+          <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate transition-colors duration-700">纯音乐 · 安静聆听</span>
         </div>
 
         {/* 控制按钮 */}

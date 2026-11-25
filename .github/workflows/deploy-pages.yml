@@ -31,7 +31,20 @@ jobs:
         run: npm ci
 
       - name: Build static site
-        run: npm run build
+        run: |
+          # next/font 会在构建时拉取 Google Fonts，偶发被限流导致失败，重试最多 3 次
+          for attempt in 1 2 3; do
+            echo "::group::Build attempt $attempt"
+            if npm run build; then
+              echo "::endgroup::"
+              exit 0
+            fi
+            echo "::endgroup::"
+            echo "构建失败（第 $attempt 次），10 秒后重试..."
+            sleep 10
+          done
+          echo "三次构建均失败"
+          exit 1
         env:
           NEXT_TELEMETRY_DISABLED: 1
 

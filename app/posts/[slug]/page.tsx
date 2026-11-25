@@ -20,15 +20,17 @@ import SidebarLyric from '../../../components/SidebarLyric';
 
 export async function generateStaticParams() {
   const postsDirectory = path.join(process.cwd(), 'posts');
-  if (!fs.existsSync(postsDirectory)) return [];
+  if (!fs.existsSync(postsDirectory)) return [{ slug: '__empty__' }];
 
   const filenames = fs.readdirSync(postsDirectory);
-
-  return filenames
+  const params = filenames
     .filter((name) => name.endsWith('.md'))
     .map((name) => ({
       slug: name.replace(/\.md$/, ''),
     }));
+
+  // 静态导出要求动态路由至少有一个页面，空状态下放一个占位参数
+  return params.length > 0 ? params : [{ slug: '__empty__' }];
 }
 
 function extractToc(content: string) {
@@ -60,7 +62,7 @@ function extractToc(content: string) {
 
 async function getPostData(slug: string) {
   const fullPath = path.join(process.cwd(), 'posts', `${slug}.md`);
-  if (!fs.existsSync(fullPath)) notFound();
+  if (!fs.existsSync(fullPath)) return null;
   const fileContents = fs.readFileSync(fullPath, 'utf8');
   let { data, content } = matter(fileContents);
 
@@ -120,6 +122,18 @@ function getRecentPosts(currentSlug: string) {
 export default async function Post({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
   const postData = await getPostData(resolvedParams.slug);
+
+  if (!postData) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-6 px-6 text-center">
+        <p className="text-lg font-bold text-slate-700 dark:text-slate-200">这篇文章不存在，或者还没有写。</p>
+        <Link href="/posts" className="px-6 py-3 rounded-full bg-indigo-500 text-white text-sm font-bold hover:bg-indigo-600 transition-colors">
+          返回文章列表
+        </Link>
+      </div>
+    );
+  }
+
   const recentPosts = getRecentPosts(resolvedParams.slug);
 
   return (

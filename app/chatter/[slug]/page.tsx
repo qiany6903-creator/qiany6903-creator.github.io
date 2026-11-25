@@ -20,18 +20,19 @@ import Comments from '../../../components/Comments';
 
 export async function generateStaticParams() {
   const chattersDirectory = path.join(process.cwd(), 'chatters');
-  if (!fs.existsSync(chattersDirectory)) return [];
+  if (!fs.existsSync(chattersDirectory)) return [{ slug: '__empty__' }];
   const filenames = fs.readdirSync(chattersDirectory);
-  return filenames
+  const params = filenames
     .filter((name) => name.endsWith('.md'))
     .map((name) => ({
       slug: name.replace(/\.md$/, ''),
     }));
+  return params.length > 0 ? params : [{ slug: '__empty__' }];
 }
 
 async function getChatterData(slug: string) {
   const fullPath = path.join(process.cwd(), 'chatters', `${slug}.md`);
-  if (!fs.existsSync(fullPath)) notFound();
+  if (!fs.existsSync(fullPath)) return null;
   const fileContents = fs.readFileSync(fullPath, 'utf8');
 
   let { data, content } = matter(fileContents);
@@ -112,6 +113,18 @@ function generateCalendarMatrix(year: number, month: number, targetDay: number) 
 export default async function ChatterDetail({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
   const chatterData = await getChatterData(resolvedParams.slug);
+
+  if (!chatterData) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-6 px-6 text-center">
+        <p className="text-lg font-bold text-slate-700 dark:text-slate-200">这篇杂谈不存在，或者还没有写。</p>
+        <Link href="/chatter" className="px-6 py-3 rounded-full bg-indigo-500 text-white text-sm font-bold hover:bg-indigo-600 transition-colors">
+          返回杂谈列表
+        </Link>
+      </div>
+    );
+  }
+
   const recentChatters = getRecentChatters(resolvedParams.slug);
 
   const dateObj = new Date(chatterData.date || '2026-03-24');

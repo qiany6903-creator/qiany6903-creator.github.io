@@ -11,8 +11,11 @@ import { siteConfig } from '../siteConfig'; // 如果路径报错，请检查层
 export default function Comments() {
   const containerRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  // 未配置 Gitalk 凭证时完全不渲染评论区（静态站点也没有评论代理接口）
+  const enabled = Boolean(siteConfig.gitalkConfig?.clientID);
 
   useEffect(() => {
+    if (!enabled) return;
     if (!containerRef.current) return;
 
     // 清空之前的评论区（防止 Next.js 路由切换时重复渲染）
@@ -42,7 +45,9 @@ export default function Comments() {
       window.history.replaceState({}, document.title, url.toString());
     }
 
-  }, [pathname]);
+  }, [pathname, enabled]);
+
+  if (!enabled) return null;
 
   return (
     <div className="w-full mt-16 relative">

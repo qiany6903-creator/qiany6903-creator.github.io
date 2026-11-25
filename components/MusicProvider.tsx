@@ -84,6 +84,11 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     let isMounted = true;
     const fetchMusicData = async () => {
       try {
+        // 没有配置歌曲时直接跳过，避免静态站点上请求不存在的接口
+        if (!siteConfig.cloudMusicIds || siteConfig.cloudMusicIds.length === 0) {
+          setIsLoading(false);
+          return;
+        }
         const res = await fetch(`/api/music?ids=${siteConfig.cloudMusicIds.join(',')}`);
         const rawResults = await res.json();
 

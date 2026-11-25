@@ -7,8 +7,9 @@
  * 说明：
  * - 网易云的 /api/song/detail 接口对普通请求限流（405 操作频繁），
  *   所以歌曲信息改为解析歌曲页面 HTML 里的 og:title / og:image / description
- * - 歌词单独走 /api/song/lyric 接口（不受限流影响，纯音乐返回空歌词）
+ * - 不抓歌词：站点是纯音乐歌单，播放页已移除歌词栏
  * - 播放地址用固定外链 music.163.com/song/media/outer/url，不会过期
+ * - 外链返回 HTML（VIP/版权受限）的歌曲会被自动跳过
  * - 生成结果提交到仓库，静态站点直接读取 /music.json，不依赖服务端
  */
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
@@ -59,19 +60,6 @@ async function fetchSong(id) {
   const artist = artistMatches.length > 0 ? artistMatches[artistMatches.length - 1][1].trim() : '未知歌手';
   const cover = coverRaw.replace(/^http:\/\//, 'https://');
 
-  // 歌词：纯音乐或接口异常时留空，不影响播放
-  let lrc = '';
-  try {
-    const lrcRaw = await fetchText(
-      `https://music.163.com/api/song/lyric?id=${id}&lv=-1&kv=-1&tv=-1`,
-      8000,
-    );
-    const parsed = JSON.parse(lrcRaw);
-    lrc = parsed?.lrc?.lyric || '';
-  } catch {
-    /* 歌词可选 */
-  }
-
   // 播放地址是固定外链；但要先确认它真的返回音频
   // 部分歌曲（VIP/版权受限）会返回一个 HTML 页面，这种直接判定不可播放
   const url = `https://music.163.com/song/media/outer/url?id=${id}.mp3`;
@@ -95,7 +83,6 @@ async function fetchSong(id) {
     artist,
     cover,
     url,
-    lrc,
   };
 }
 

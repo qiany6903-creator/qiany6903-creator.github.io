@@ -3,7 +3,7 @@
 export const siteConfig = {
   // 1. 网站标题与博主信息
   title: "千梦之梦",
-  faviconUrl: "/avatar.png",
+  faviconUrl: `${process.env.NEXT_PUBLIC_BASE_PATH || ''}/avatar.png`,
   authorName: "千幻",
   bio: "",
 
@@ -15,7 +15,7 @@ export const siteConfig = {
   navAfter: "月寒暖屋",
 
   // 2. 头像设置 (支持网络链接，或将图片放入 public 文件夹后使用 "/me.jpg")
-  avatarUrl: "/avatar.png",
+  avatarUrl: `${process.env.NEXT_PUBLIC_BASE_PATH || ''}/avatar.png`,
 
   // 3. 网站背景设置 (二选一)
   // 如果想用纯图片背景，请在下面 bgImage 写路径，并将 useGradient 设为 false

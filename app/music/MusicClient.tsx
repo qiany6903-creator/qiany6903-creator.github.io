@@ -17,73 +17,8 @@ export default function MusicClient() {
     volume, setVolume, isMuted, toggleMute
   } = useMusic();
 
-  const lyricContainerRef = useRef<HTMLDivElement>(null);
-  const activeLyricRef = useRef<HTMLDivElement>(null);
-  const [activeTab, setActiveTab] = useState<'lyrics' | 'playlist'>('lyrics');
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-
-  const [parsedLyrics, setParsedLyrics] = useState<any[]>([]);
-
-  useEffect(() => {
-    if (!currentSong) {
-      setParsedLyrics([]);
-      return;
-    }
-
-    const rawLrc = currentSong.lrc || currentSong.lyric || (typeof currentSong.lyrics === 'string' ? currentSong.lyrics : '');
-
-    if (Array.isArray(currentSong.lyrics) && currentSong.lyrics.length > 0) {
-      setParsedLyrics(currentSong.lyrics);
-      return;
-    }
-
-    if (!rawLrc || typeof rawLrc !== 'string') {
-      setParsedLyrics([]);
-      return;
-    }
-
-    const lines = rawLrc.split('\n');
-    const parsed = [];
-    const timeExp = /\[(\d{2,}):(\d{2})(?:[.:](\d{2,3}))?\]/g;
-    let hasValidTime = false;
-
-    for (const line of lines) {
-      const text = line.replace(/\[\d{2,}:\d{2}(?:[.:]\d{2,3})?\]/g, '').trim();
-      if (!text) continue;
-
-      let match;
-      while ((match = timeExp.exec(line)) !== null) {
-        hasValidTime = true;
-        const min = parseInt(match[1], 10);
-        const sec = parseInt(match[2], 10);
-        const ms = match[3] ? parseFloat(`0.${match[3]}`) : 0;
-        parsed.push({ time: min * 60 + sec + ms, text });
-      }
-    }
-
-    if (hasValidTime) {
-      setParsedLyrics(parsed.sort((a, b) => a.time - b.time));
-    } else {
-      setParsedLyrics(lines.map(l => ({ time: -1, text: l.trim() })).filter(l => l.text));
-    }
-  }, [currentSong?.id, currentSong?.lyric, currentSong?.lrc, currentSong?.lyrics]);
-
-  const activeLyricIndex = useMemo(() => {
-    if (!parsedLyrics.length) return -1;
-    let idx = parsedLyrics.findIndex((l: any) => l.time > currentTime) - 1;
-    if (idx === -2) idx = parsedLyrics.length - 1;
-    return Math.max(0, idx);
-  }, [currentTime, parsedLyrics]);
-
-  useEffect(() => {
-    if (activeLyricRef.current && lyricContainerRef.current && activeTab === 'lyrics') {
-      const container = lyricContainerRef.current;
-      const activeItem = activeLyricRef.current;
-      const scrollTarget = activeItem.offsetTop - container.offsetHeight / 2 + activeItem.offsetHeight / 2;
-      container.scrollTo({ top: scrollTarget, behavior: 'smooth' });
-    }
-  }, [activeLyricIndex, activeTab]);
 
   const formatTime = (time: number) => {
     if (!time || isNaN(time)) return "0:00";
@@ -195,45 +130,9 @@ export default function MusicClient() {
               </div>
             </div>
 
-            {/* ====== 右侧/底部：歌词与歌单面板 ====== */}
+            {/* ====== 右侧/底部：歌单面板 ====== */}
             <div className="md:col-span-7 flex flex-col bg-white/40 dark:bg-slate-800/50 backdrop-blur-md border border-white/40 dark:border-white/10 rounded-[32px] shadow-2xl relative transition-colors duration-700 overflow-hidden h-[450px] md:h-auto shrink-0">
-              <div className="flex items-center justify-center gap-1 p-1 mt-4 md:mt-6 mx-auto bg-white/50 dark:bg-slate-900/50 rounded-full shadow-inner border border-white/40 w-48 md:w-64 z-20 shrink-0">
-                <button onClick={() => setActiveTab('lyrics')} className={`flex-1 py-1.5 md:py-2 rounded-full font-black text-xs md:text-[13px] transition-all ${activeTab === 'lyrics' ? 'bg-indigo-500 text-white shadow-md' : 'text-slate-500'}`}>歌词</button>
-                <button onClick={() => setActiveTab('playlist')} className={`flex-1 py-1.5 md:py-2 rounded-full font-black text-xs md:text-[13px] transition-all ${activeTab === 'playlist' ? 'bg-indigo-500 text-white shadow-md' : 'text-slate-500'}`}>歌单</button>
-              </div>
-
               <div className="flex-1 relative mt-2 flex flex-col overflow-hidden">
-                {activeTab === 'lyrics' && (
-                  <div className="absolute inset-0 flex flex-col h-full animate-in fade-in duration-300">
-                    <div className="absolute top-0 left-0 right-0 h-32 md:h-40 bg-gradient-to-b from-white/40 dark:from-slate-800/60 to-transparent z-10 pointer-events-none" />
-                    <div className="absolute bottom-0 left-0 right-0 h-32 md:h-40 bg-gradient-to-t from-white/40 dark:from-slate-800/60 to-transparent z-10 pointer-events-none" />
-                    <div ref={lyricContainerRef} className="h-full overflow-y-auto no-scrollbar scroll-smooth relative px-4 md:px-6 lyric-mask-container">
-                        <div className="py-[30vh] md:py-[35vh] flex flex-col gap-4 md:gap-6 text-center lg:px-10">
-                            {parsedLyrics.length > 0 ? (
-                              parsedLyrics.map((line: any, index: number) => {
-                                const isActive = index === activeLyricIndex;
-                                return (
-                                  <div key={index} ref={isActive ? activeLyricRef : null}
-                                    className={`transition-all duration-700 cursor-pointer px-2 md:px-4 rounded-2xl ${isActive ? 'opacity-100 scale-105 py-2 md:py-3 bg-white/10' : 'opacity-20 hover:opacity-40'}`}
-                                    onClick={() => duration > 0 && handleSeek({ target: { value: String((line.time / duration) * 100) } } as any)}
-                                  >
-                                    <p className={`font-black tracking-tight leading-relaxed transition-all duration-700 ${isActive ? 'text-lg md:text-2xl text-indigo-600 dark:text-indigo-400' : 'text-sm md:text-lg text-slate-700 dark:text-slate-300'}`} style={isActive ? { textShadow: '0 0 20px rgba(99,102,241,0.15)' } : {}}>{line.text}</p>
-                                  </div>
-                                );
-                              })
-                            ) : (
-                              <div className="h-full flex items-center justify-center">
-                                 <div className="flex flex-col items-center gap-3 md:gap-4">
-                                    <Disc3 className="animate-spin text-indigo-500/40" size={32} />
-                                    <p className="text-base md:text-xl font-black text-indigo-500 animate-pulse">{currentLyric || "正在捕获灵魂旋律..."}</p>
-                                 </div>
-                              </div>
-                            )}
-                        </div>
-                    </div>
-                  </div>
-                )}
-                {activeTab === 'playlist' && (
                   <div className="absolute inset-0 px-4 md:px-8 pb-4 md:pb-8 pt-2 md:pt-4 animate-in fade-in duration-300 flex flex-col">
                   <div className="flex items-center gap-3 mb-4 md:mb-8 shrink-0 w-full">
                     <div className="relative w-full max-w-md mx-auto group">
@@ -290,7 +189,6 @@ export default function MusicClient() {
                       </AnimatePresence>
                     </div>
                   </div>
-                )}
               </div>
             </div>
           </div>

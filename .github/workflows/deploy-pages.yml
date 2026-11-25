@@ -34,7 +34,6 @@ jobs:
         run: npm run build
         env:
           NEXT_TELEMETRY_DISABLED: 1
-          NEXT_PUBLIC_BASE_PATH: /qianhuan6903
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

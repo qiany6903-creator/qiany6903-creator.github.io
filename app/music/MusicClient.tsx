@@ -235,12 +235,41 @@ export default function MusicClient() {
                 )}
                 {activeTab === 'playlist' && (
                   <div className="absolute inset-0 px-4 md:px-8 pb-4 md:pb-8 pt-2 md:pt-4 animate-in fade-in duration-300 flex flex-col">
-                    <div className="relative w-full max-w-md mx-auto group mb-4 md:mb-8 shrink-0">
+                  <div className="flex items-center gap-3 mb-4 md:mb-8 shrink-0 w-full">
+                    <div className="relative w-full max-w-md mx-auto group">
                       <div className="absolute inset-0 bg-indigo-500/5 blur-xl group-focus-within:bg-indigo-500/10 transition-all rounded-full" />
                       <Search className="w-4 h-4 md:w-5 md:h-5 absolute left-4 top-1/2 -translate-y-1/2 z-10 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
                       <input type="text" placeholder="搜索音轨..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full h-10 md:h-12 pl-10 md:pl-12 pr-10 md:pr-12 bg-white/30 dark:bg-slate-900/60 backdrop-blur-md border border-white/50 dark:border-white/10 rounded-full text-xs md:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/40 shadow-inner transition-all" />
                       {searchQuery && (<button onClick={() => setSearchQuery('')} className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 hover:bg-black/10 rounded-full transition-colors"><X size={14} className="text-slate-500" /></button>)}
                     </div>
+
+                    {/* 音量控制：静音开关 + 滑杆，手机上也能用 */}
+                    <div className="flex items-center gap-2 shrink-0 h-10 md:h-12 px-3 rounded-full bg-white/30 dark:bg-slate-900/60 backdrop-blur-md border border-white/50 dark:border-white/10 shadow-inner">
+                      <button
+                        onClick={toggleMute}
+                        title={isMuted ? '取消静音' : '静音'}
+                        aria-label={isMuted ? '取消静音' : '静音'}
+                        className="text-slate-500 hover:text-indigo-500 transition-colors"
+                      >
+                        {isMuted || !volume ? <VolumeX size={16} /> : <Volume2 size={16} />}
+                      </button>
+                      <input
+                        type="range"
+                        min={0}
+                        max={1}
+                        step={0.01}
+                        value={isMuted ? 0 : (volume || 0)}
+                        onChange={(e) => {
+                          const next = Number(e.target.value);
+                          if (isMuted && next > 0) toggleMute();
+                          setVolume(next);
+                        }}
+                        aria-label="音量"
+                        className="w-16 md:w-24 h-1 appearance-none rounded-full cursor-pointer"
+                        style={{ background: `linear-gradient(to right, #4f46e5 ${(isMuted ? 0 : (volume || 0)) * 100}%, rgba(0, 0, 0, 0.15) 0)` }}
+                      />
+                    </div>
+                  </div>
                     <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 flex flex-col gap-2 md:gap-2.5">
                       <AnimatePresence mode='popLayout'>
                         {filteredPlaylist.map((song: any) => {

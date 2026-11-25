@@ -234,6 +234,15 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // 外链失效（版权受限/CDN 异常）时自动跳下一首，避免卡在一首放不了的歌上
+  const handleAudioError = () => {
+    if (playlist.length > 1) {
+      nextSong();
+    } else if (audioRef.current) {
+      setIsPlaying(false);
+    }
+  };
+
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newProgress = Number(e.target.value);
     setProgress(newProgress);
@@ -273,6 +282,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
           src={currentSong.src}
           onTimeUpdate={handleTimeUpdate}
           onEnded={handleEnded} // 使用我们重写的结束处理
+          onError={handleAudioError}
           onLoadedMetadata={handleTimeUpdate}
         />
       )}

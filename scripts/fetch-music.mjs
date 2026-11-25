@@ -47,7 +47,6 @@ async function fetchText(url, timeout = 12000) {
 
 async function fetchSong(id) {
   const html = await fetchText(`https://music.163.com/song?id=${id}`);
-
   const name = pick(html, /<meta[^>]+property="og:title"[^>]+content="([^"]*)"/);
   const coverRaw = pick(html, /<meta[^>]+property="og:image"[^>]+content="([^"]*)"/);
   const description = pick(html, /"description":\s*"([^"]*)"/);
@@ -73,12 +72,29 @@ async function fetchSong(id) {
     /* 歌词可选 */
   }
 
+  // 播放地址是固定外链；但要先确认它真的返回音频
+  // 部分歌曲（VIP/版权受限）会返回一个 HTML 页面，这种直接判定不可播放
+  const url = `https://music.163.com/song/media/outer/url?id=${id}.mp3`;
+  try {
+    const probe = await fetch(url, {
+      headers: { ...HEADERS, Range: 'bytes=0-1023' },
+      redirect: 'follow',
+      signal: AbortSignal.timeout(10000),
+    });
+    const type = probe.headers.get('content-type') || '';
+    if (!/audio|mpeg|octet-stream/i.test(type)) {
+      return { unplayable: true };
+    }
+  } catch {
+    return { unplayable: true };
+  }
+
   return {
     id,
     name,
     artist,
     cover,
-    url: `https://music.163.com/song/media/outer/url?id=${id}.mp3`,
+    url,
     lrc,
   };
 }
@@ -97,12 +113,16 @@ async function main() {
 
   const results = [];
   const failed = [];
+  const unplayable = [];
 
   for (let i = 0; i < ids.length; i += 1) {
     const id = ids[i];
     try {
       const song = await fetchSong(id);
-      if (song) {
+      if (song?.unplayable) {
+        unplayable.push(id);
+        process.stdout.write(`\r[${i + 1}/${ids.length}] 跳过（不可播放）${id}`.padEnd(60).slice(0, 60));
+      } else if (song) {
         results.push(song);
         process.stdout.write(`\r[${i + 1}/${ids.length}] ${song.name} - ${song.artist}`.padEnd(60).slice(0, 60));
       } else {
@@ -117,9 +137,12 @@ async function main() {
 
   await writeFile(OUTPUT_FILE, JSON.stringify(results, null, 2) + '\n', 'utf8');
 
-  console.log(`✅ 成功 ${results.length} 首，写入 ${path.relative(ROOT, OUTPUT_FILE)}`);
+  console.log(`✅ 收录 ${results.length} 首，写入 ${path.relative(ROOT, OUTPUT_FILE)}`);
+  if (unplayable.length > 0) {
+    console.log(`⏭️ 跳过 ${unplayable.length} 首（网易云外链不可用，VIP/版权受限）：${unplayable.join(', ')}`);
+  }
   if (failed.length > 0) {
-    console.log(`⚠️ 失败 ${failed.length} 首（可能已下架或版权受限）：${failed.join(', ')}`);
+    console.log(`⚠️ 失败 ${failed.length} 首（页面不存在或接口异常）：${failed.join(', ')}`);
   }
 }
 

@@ -13,27 +13,8 @@ const formatTime = (time: number) => {
 
 export default function CloudPlayer() {
   const { playlist, currentSong, isPlaying, progress, currentTime, duration, currentLyric, isLoading, togglePlay, nextSong, prevSong, handleSeek } = useMusic();
-  const [displayedLyric, setDisplayedLyric] = useState("");
   // 🌟 初始化路由
   const router = useRouter();
-
-  useEffect(() => {
-    let i = 0;
-    setDisplayedLyric("");
-    const target = currentLyric || "";
-    if (!target) return;
-
-    const typingInterval = setInterval(() => {
-      if (i <= target.length) {
-        setDisplayedLyric(target.slice(0, i));
-        i++;
-      } else {
-        clearInterval(typingInterval);
-      }
-    }, 50);
-
-    return () => clearInterval(typingInterval);
-  }, [currentLyric]);
 
   if (isLoading) {
     return (
@@ -119,7 +100,7 @@ export default function CloudPlayer() {
         </div>
 
         <div className="relative z-10 mb-2 h-6 overflow-hidden">
-           <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400 truncate">{displayedLyric}</p>
+           <p className="text-xs font-bold text-slate-400 dark:text-slate-500 truncate">纯音乐歌单</p>
         </div>
 
         <div className="relative z-10 mt-auto">

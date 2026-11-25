@@ -3,6 +3,7 @@ import path from 'path';
 import matter from 'gray-matter';
 import { renderMarkdown } from '../../../lib/renderMarkdown.mjs';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
 // 🌟 核心升级：引入 Next.js 现代统一解析流
 
@@ -30,6 +31,7 @@ export async function generateStaticParams() {
 
 async function getChatterData(slug: string) {
   const fullPath = path.join(process.cwd(), 'chatters', `${slug}.md`);
+  if (!fs.existsSync(fullPath)) notFound();
   const fileContents = fs.readFileSync(fullPath, 'utf8');
 
   let { data, content } = matter(fileContents);

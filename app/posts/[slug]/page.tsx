@@ -3,6 +3,7 @@ import path from 'path';
 import matter from 'gray-matter';
 import { renderMarkdown } from '../../../lib/renderMarkdown.mjs';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
 
 // 引入高亮主题
@@ -59,6 +60,7 @@ function extractToc(content: string) {
 
 async function getPostData(slug: string) {
   const fullPath = path.join(process.cwd(), 'posts', `${slug}.md`);
+  if (!fs.existsSync(fullPath)) notFound();
   const fileContents = fs.readFileSync(fullPath, 'utf8');
   let { data, content } = matter(fileContents);
 

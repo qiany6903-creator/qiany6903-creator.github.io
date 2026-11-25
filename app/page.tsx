@@ -35,6 +35,33 @@ function formatUpdateTime(dateString: string) {
   } catch { return dateString; }
 }
 
+// 从「关于」页提取简介：取正文前几段、去掉 Markdown 标记，资料卡直接复用
+function extractAboutBio() {
+  try {
+    const aboutPath = path.join(process.cwd(), 'app', 'about', 'about.md');
+    if (!fs.existsSync(aboutPath)) return '';
+    const raw = fs.readFileSync(aboutPath, 'utf8');
+    const body = raw.replace(/^---[\s\S]*?---\s*/, '');
+    const text = body
+      .split(/\n\s*\n/)
+      .map((paragraph) => paragraph.trim())
+      .filter((paragraph) => paragraph && !/^#{1,6}\s/.test(paragraph))
+      .map((paragraph) =>
+        paragraph
+          .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
+          .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+          .replace(/[`*_>#]/g, '')
+          .replace(/\s+/g, ' ')
+          .trim()
+      )
+      .filter(Boolean)
+      .join(' ');
+    return text.length > 140 ? `${text.slice(0, 140)}…` : text;
+  } catch {
+    return '';
+  }
+}
+
 export default function Home() {
   const postsDirectory = path.join(process.cwd(), 'posts');
   let allPosts: any[] = [];
@@ -87,6 +114,7 @@ export default function Home() {
 
   const chatterCount = allChatters.length;
   const realPhotoCount = albums.reduce((total, album) => total + album.photos.length, 0);
+  const aboutBio = extractAboutBio();
   const latestAlbum = albums.length > 0 ? albums[0] : { id: '', title: '画册', description: '查看摄影', cover: siteConfig.photoWallImage, date: '' };
 
   return (
@@ -103,7 +131,7 @@ export default function Home() {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full">
                 {/* 手机上占满1列，电脑上占7列 */}
                 <div className="col-span-1 lg:col-span-7 flex flex-col">
-                    <ProfileCard postCount={allPosts.length} chatterCount={chatterCount} photoCount={realPhotoCount}/>
+                    <ProfileCard postCount={allPosts.length} chatterCount={chatterCount} photoCount={realPhotoCount} bio={aboutBio} />
                 </div>
                 {/* 手机上占满1列，电脑上占5列 */}
                 <div className="col-span-1 lg:col-span-5 flex flex-col">

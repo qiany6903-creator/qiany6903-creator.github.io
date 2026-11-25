@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { siteConfig } from '../siteConfig';
 
-export default function ProfileCard({ postCount, chatterCount, photoCount }: { postCount: number, chatterCount: number, photoCount: number }) {
+export default function ProfileCard({ postCount, chatterCount, photoCount, bio }: { postCount: number, chatterCount: number, photoCount: number, bio?: string }) {
   const router = useRouter();
 
   return (
@@ -42,7 +42,7 @@ export default function ProfileCard({ postCount, chatterCount, photoCount }: { p
 
         {/* 个人简介：取代原来的社交小图标 */}
         <p className="flex-1 md:max-w-sm lg:max-w-md text-xs sm:text-sm text-slate-700 dark:text-slate-300 font-medium leading-relaxed transition-colors duration-700 text-center md:text-right line-clamp-3">
-          {siteConfig.bio || '这个人很懒，还没写简介。'}
+          {bio || siteConfig.bio || '这个人很懒，还没写简介。'}
         </p>
       </div>
     </div>

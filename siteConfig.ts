@@ -1,5 +1,8 @@
 // siteConfig.ts - 你的全站“控制中心”
 
+// GitHub Pages 子路径部署时自动加前缀；根路径部署时为空字符串
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH || '';
+
 export const siteConfig = {
   // 1. 网站标题与博主信息
   title: "千梦之梦",
@@ -22,17 +25,17 @@ export const siteConfig = {
   useGradient: false,
   themeColors: ["#a18cd1", "#fbc2eb", "#a1c4fd", "#c2e9fb"], // 呼吸流动的颜色组合
 // 修改这里：变成图片数组
-  bgImages: ["https://bu.dusays.com/2026/03/24/69c1e38b4c370.jpg", "https://bu.dusays.com/2026/03/24/69c26fe4acdb5.jpg", "https://bu.dusays.com/2026/03/24/69c26fe4d9486.jpg"],
+  bgImages: [`${BASE}/bg/bg-01.jpg`, `${BASE}/bg/bg-02.jpg`, `${BASE}/bg/bg-03.jpg`, `${BASE}/bg/bg-04.jpg`, `${BASE}/bg/bg-05.jpg`, `${BASE}/bg/bg-06.jpg`, `${BASE}/bg/bg-07.jpg`, `${BASE}/bg/bg-08.jpg`, `${BASE}/bg/bg-09.jpg`, `${BASE}/bg/bg-10.jpg`, `${BASE}/bg/bg-11.jpg`, `${BASE}/bg/bg-12.jpg`, `${BASE}/bg/bg-13.jpg`, `${BASE}/bg/bg-14.jpg`, `${BASE}/bg/bg-15.jpg`, `${BASE}/bg/bg-16.jpg`, `${BASE}/bg/bg-17.jpg`, `${BASE}/bg/bg-18.jpg`, `${BASE}/bg/bg-19.jpg`, `${BASE}/bg/bg-20.jpg`, `${BASE}/bg/bg-21.jpg`, `${BASE}/bg/bg-22.jpg`, `${BASE}/bg/bg-23.jpg`, `${BASE}/bg/bg-24.jpg`, `${BASE}/bg/bg-25.jpg`, `${BASE}/bg/bg-26.jpg`, `${BASE}/bg/bg-27.jpg`, `${BASE}/bg/bg-28.jpg`, `${BASE}/bg/bg-29.jpg`, `${BASE}/bg/bg-30.jpg`],
 
   // 🌟 壁纸分组系统：前台轮播「激活分组」内的图片（保持 JSON 格式，便于后台解析）
-  bgGroups: [{"id": "default", "name": "默认", "images": ["https://bu.dusays.com/2026/03/24/69c1e38b4c370.jpg", "https://bu.dusays.com/2026/03/24/69c26fe4acdb5.jpg", "https://bu.dusays.com/2026/03/24/69c26fe4d9486.jpg"]}],
+  bgGroups: [{"id": "default", "name": "默认", "images": [`${BASE}/bg/bg-01.jpg`, `${BASE}/bg/bg-02.jpg`, `${BASE}/bg/bg-03.jpg`, `${BASE}/bg/bg-04.jpg`, `${BASE}/bg/bg-05.jpg`, `${BASE}/bg/bg-06.jpg`, `${BASE}/bg/bg-07.jpg`, `${BASE}/bg/bg-08.jpg`, `${BASE}/bg/bg-09.jpg`, `${BASE}/bg/bg-10.jpg`, `${BASE}/bg/bg-11.jpg`, `${BASE}/bg/bg-12.jpg`, `${BASE}/bg/bg-13.jpg`, `${BASE}/bg/bg-14.jpg`, `${BASE}/bg/bg-15.jpg`, `${BASE}/bg/bg-16.jpg`, `${BASE}/bg/bg-17.jpg`, `${BASE}/bg/bg-18.jpg`, `${BASE}/bg/bg-19.jpg`, `${BASE}/bg/bg-20.jpg`, `${BASE}/bg/bg-21.jpg`, `${BASE}/bg/bg-22.jpg`, `${BASE}/bg/bg-23.jpg`, `${BASE}/bg/bg-24.jpg`, `${BASE}/bg/bg-25.jpg`, `${BASE}/bg/bg-26.jpg`, `${BASE}/bg/bg-27.jpg`, `${BASE}/bg/bg-28.jpg`, `${BASE}/bg/bg-29.jpg`, `${BASE}/bg/bg-30.jpg`]}],
   activeBgGroup: "default",
 
   // 4. 文章默认封面图 (当 Markdown 没写 cover 时显示)
-  defaultPostCover: "https://bu.dusays.com/2026/03/24/69c1e38b346cb.jpg",
+  defaultPostCover: `${BASE}/bg/bg-02.jpg`,
 
   // 5. 首页画册预览图
-  photoWallImage: "https://bu.dusays.com/2026/03/24/69c1e38b4c370.jpg",
+  photoWallImage: `${BASE}/bg/bg-01.jpg`,
   cloudMusicIds: ["4946882", "1329750280", "548145350", "1828201502", "34040337", "1499701375", "1357953766", "39122064", "509098790", "1497575651", "504264248", "2619059130", "31861274", "1821698772", "39227596", "2743870808", "29849547", "461758", "1440363352", "1971812306", "1898812547", "1831401713", "1831400985", "1831400558", "2150491694", "1831400576", "1903408778", "2654761264", "523658868"],
   social: {
     github: "",

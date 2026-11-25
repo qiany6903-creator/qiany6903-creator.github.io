@@ -71,9 +71,8 @@ export default async function AboutPage() {
 
   const posts = getDirActivities(path.join(process.cwd(), 'posts'), 'posts', '文章', 'posts');
   const chatters = getDirActivities(path.join(process.cwd(), 'chatters'), 'chatters', '杂谈', 'chatter');
-  const moments = getDirActivities(path.join(process.cwd(), 'moments'), 'moments', '说说', 'moments');
 
-  const allActivities = [...posts, ...chatters, ...moments].sort((a, b) => {
+  const allActivities = [...posts, ...chatters].sort((a, b) => {
     return new Date(b.date).getTime() - new Date(a.date).getTime();
   });
 

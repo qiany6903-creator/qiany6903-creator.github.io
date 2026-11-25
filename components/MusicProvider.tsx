@@ -73,10 +73,10 @@ export function MusicProvider({ children }: { children: ReactNode }) {
   const [currentLyric, setCurrentLyric] = useState("正在连接高可用神经云端...");
   const [isLoading, setIsLoading] = useState(true);
 
-  // 🌟 2. 新增音量和播放模式状态
+  // 🌟 2. 新增音量和播放模式状态（默认随机播放）
   const [volume, setVolumeState] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
-  const [playMode, setPlayMode] = useState<PlayMode>('loop');
+  const [playMode, setPlayMode] = useState<PlayMode>('random');
 
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -103,8 +103,13 @@ export function MusicProvider({ children }: { children: ReactNode }) {
           }));
 
         if (isMounted) {
-          if (mergedPlaylist.length > 0) setPlaylist(mergedPlaylist);
-          else setCurrentLyric("云端链路受阻");
+          if (mergedPlaylist.length > 0) {
+            setPlaylist(mergedPlaylist);
+            // 随机播放：首曲也从随机位置开始，避免每次都从第一首起
+            setCurrentIndex(Math.floor(Math.random() * mergedPlaylist.length));
+          } else {
+            setCurrentLyric("云端链路受阻");
+          }
           setIsLoading(false);
         }
       } catch (error) {
@@ -170,10 +175,20 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // 随机取一首（尽量避开当前这首，避免连播同一首歌）
+  const pickRandomIndex = (length: number, current?: number) => {
+    if (length <= 1) return 0;
+    let index = Math.floor(Math.random() * length);
+    if (current !== undefined && index === current) {
+      index = (index + 1 + Math.floor(Math.random() * (length - 1))) % length;
+    }
+    return index;
+  };
+
   // 🌟 5. 重写 nextSong，加入对随机模式的处理
   const nextSong = () => {
     if (playMode === 'random') {
-      setCurrentIndex(Math.floor(Math.random() * playlist.length));
+      setCurrentIndex(pickRandomIndex(playlist.length, currentIndex));
     } else {
       setCurrentIndex((prev) => (prev + 1) % playlist.length);
     }
@@ -181,7 +196,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
 
   const prevSong = () => {
     if (playMode === 'random') {
-      setCurrentIndex(Math.floor(Math.random() * playlist.length));
+      setCurrentIndex(pickRandomIndex(playlist.length, currentIndex));
     } else {
       setCurrentIndex((prev) => (prev - 1 + playlist.length) % playlist.length);
     }
